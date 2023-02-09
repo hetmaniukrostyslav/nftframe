@@ -70,7 +70,7 @@ namespace TokenCast.Controllers
 
             var backgroundColor = ColorTranslator.FromHtml(content.currentDisplay.backgroundColor);
             var backgroundImage = new Image<Rgba32>(Configuration.Default,
-                content.currentDisplay.Cropper.Height, content.currentDisplay.Cropper.Height,
+                content.currentDisplay.Cropper.Width, content.currentDisplay.Cropper.Height,
                 new Rgba32(backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A));
 
             var offsetX = content.currentDisplay.Cropper.Left;
@@ -103,7 +103,6 @@ namespace TokenCast.Controllers
             backgroundImage.Mutate(bg =>
             {
                 bg.DrawImage(image, new Point(newPositionX, newPositionY), 1);
-                bg.Resize(content.currentDisplay.Cropper.Width, content.currentDisplay.Cropper.Height);
 
                 if (height.HasValue && width.HasValue)
                 {
