@@ -113,7 +113,8 @@ namespace TokenCast.Controllers
             using var resizedStream = new MemoryStream();
             await backgroundImage.SaveAsJpegAsync(resizedStream);
                 
-            var inputAsString = Convert.ToBase64String(resizedStream.ToArray());;
+            var inputAsString = Convert.ToBase64String(resizedStream.ToArray());
+            var total = inputAsString.Length;
 
             if (skip.HasValue && take.HasValue)
             {
@@ -123,7 +124,7 @@ namespace TokenCast.Controllers
             return Ok(new
             {
                 c = inputAsString,
-                t = inputAsString.Length
+                t = total
             });
         }
 
