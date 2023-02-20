@@ -8,6 +8,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-qrcode-reader/dist/VueQrcodeReader.umd.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -243,20 +244,22 @@
             <div class="col-md-6 col-sm-12 center">
                 <div style="width: 330px;height: 401px">
                     <cropper
+                        ref="cropper"
                         id="tokenPreviewContainer"
                         :src="selectedToken.image_url"
-                        :stencil-props="{
-                              		        aspectRatio: 368/448,
-                              	        }"
+                        :stencil-props="{aspectRatio: 368/448}"
                         image-restriction="none"
                         background-class="cropper-background"
                         v-on:change="cropperChange">
                     </cropper>
+                    
+                    <button v-on:click="rotate(90)" style="position: absolute;top: 5px;left: 20px;" type="button" class="btn btn-sm btn-outline-light"><i class="fa fa-flip-vertical fa fa-undo"></i></button>
+                    <button v-on:click="rotate(-90)" style="position: absolute;top: 40px;left: 20px;" type="button" class="btn btn-sm btn-outline-light"><i class="fa fa-undo"></i></button>
                 </div>
             </div>
 
             <div class="col-md-6 col-sm-12">
-                <div class="nft-preview mt-1">
+                <div class="nft-preview mt-1 center">
                     <img
                         :style="{backgroundColor: selectedBackgroundColor}"
                         v-if="canvas"
@@ -813,7 +816,6 @@
         });
       },
       async CastToken () {
-        this.showTokenDisplayOptions = false
         const token = this.selectedToken
         const device = document.getElementById("deviceSelection").value
         storeLastUsedDevice(device)
@@ -828,7 +830,9 @@
           }
         }
 
-        const imageMeta = await this.GetImageMeta(tokenImageUrl)
+        //const imageMeta = await this.GetImageMeta(tokenImageUrl)
+        
+        console.log(this.$refs.cropper)
         
         const content = {
           id: device,
@@ -848,10 +852,12 @@
                 height: this.cropperParams.height, 
                 left: this.cropperParams.left,
                 top: this.cropperParams.top
-            }
+            },
+            rotateAngle: this.$refs.cropper.imageTransforms.rotate
           }
         }
         
+        this.showTokenDisplayOptions = false
         console.log(content)
         
         $.post("Account/SetDeviceContent?address=" + web3Account + "&signature=" + signature + "&network=" + app.network + "&whitelabeler=" + app.whitelabeler,
@@ -861,7 +867,7 @@
               alert("Cast Failed")
             }
             else {
-              alert("Token Added To Queue!")
+                alert("Token casted!")
             }
           })
       },
@@ -948,6 +954,9 @@
       GetLogOf (){
         const input = document.getElementById("frequencyOfRotation")
         this.rotationFrequency = Math.pow(2, input.value)
+      },
+      rotate(angle) {
+          this.$refs.cropper.rotate(angle)
       }
     },
     directives: {

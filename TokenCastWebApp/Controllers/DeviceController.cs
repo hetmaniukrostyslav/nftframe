@@ -59,10 +59,18 @@ namespace TokenCast.Controllers
             using var stream = new MemoryStream(imageBytes);
             var image = await Image.LoadAsync(stream);
 
+            if (content.currentDisplay.rotateAngle != 0)
+            {
+                image.Mutate(x =>
+                {
+                    x.Rotate(content.currentDisplay.rotateAngle);
+                });
+            }
+
             var intersection = Rectangle.Intersect(new Rectangle(0, 0, image.Width, image.Height),
                 new Rectangle(content.currentDisplay.Cropper.Left, content.currentDisplay.Cropper.Top,
                     content.currentDisplay.Cropper.Width, content.currentDisplay.Cropper.Height));
-                    
+            
             image.Mutate(x =>
             {
                 x.Crop(intersection);

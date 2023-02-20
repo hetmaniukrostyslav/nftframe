@@ -51,6 +51,7 @@ namespace TokenCast.Models
         public string currentPrice { get; set; }
         public ImageFrame Image { get; set; }
         public CropperFrame Cropper { get; set; }
+        public int rotateAngle { get; set; }
     }
 
     public class ImageFrame
