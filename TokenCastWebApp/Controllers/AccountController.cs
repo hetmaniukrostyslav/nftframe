@@ -5,6 +5,9 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using GraphQL.Client.Abstractions;
+using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.Newtonsoft;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Nethereum.Hex.HexConvertors.Extensions;
@@ -391,13 +394,13 @@ namespace TokenCast.Controllers
         public string CommunityTokens()
         {
             TokenList tokenList = new TokenList();
-            tokenList.assets = new List<Token>();
-            addEthereumTokensForUser(tokenList, communityWalletEthereum);
-            addTezosTokensForUser(tokenList, communityWalletTezos);
-            foreach (Token token in tokenList.assets)
-            {
-                token.description += " - Owned by TokenCast Community";
-            }
+            // tokenList.assets = new List<Token>();
+            // addEthereumTokensForUser(tokenList, communityWalletEthereum);
+            // addTezosTokensForUser(tokenList, communityWalletTezos);
+            // foreach (Token token in tokenList.assets)
+            // {
+            //     token.description += " - Owned by TokenCast Community";
+            // }
             return JsonConvert.SerializeObject(tokenList);
         }
 
@@ -497,44 +500,39 @@ namespace TokenCast.Controllers
 
         private void addTezosTokensForUser(TokenList tokenList, string address)
         {
-            Uri hicetnuncAPI = new Uri("https://api.teztools.io/v1/graphql");
-            var queryBody = "{\"query\":\"\\nquery collectorGallery($address: String!) {\\n  hic_et_nunc_token_holder(where: {holder_id: {_eq: $address}, token: {creator: {address: {_neq: $address}}}, quantity: {_gt: \\\"0\\\"}}, order_by: {token_id: desc}) {\\n    token {\\n      id\\n      artifact_uri\\n      display_uri\\n      thumbnail_uri\\n      timestamp\\n      mime\\n      title\\n      description\\n      supply\\n      royalties\\n      creator {\\n        address\\n        name\\n      }\\n    }\\n  }\\n}\\n\",\"variables\":{\"address\":\"" + address + "\"},\"operationName\":\"collectorGallery\"}";
-            var requestBody = new StringContent(queryBody, Encoding.UTF8, "application/json");
-            HttpClient client = new HttpClient();
-            var response = client.PostAsync(hicetnuncAPI, requestBody).Result;
-            
-            if (response.IsSuccessStatusCode)
+            var graphClient = new GraphQLHttpClient("https://data.objkt.com/v3/graphql", new NewtonsoftJsonSerializer());
+            var request = new GraphQLHttpRequest
             {
-                string jsonList = response.Content.ReadAsStringAsync().Result;
-                TezosQueryResponse tezosTokens = JsonConvert.DeserializeObject<TezosQueryResponse>(jsonList);
-                if (tezosTokens.data == null)
+                Query = "query GetTokens($address: String) {token_holder(where: {holder_address: {_eq: $address}}) {holder_address token {artifact_uri name token_id description mime}}}",
+                OperationName = "GetTokens",
+                Variables = new
                 {
-                    return;
+                    address
                 }
-                foreach(TezosToken tezosToken in tezosTokens.data.hic_et_nunc_token_holder)
+            };
+            var response = graphClient.SendQueryAsync<dynamic>(request).Result;
+            
+            if (response.Data != null)
+            {
+                foreach(var tokenHolder in response.Data.token_holder)
                 {
-                    tezosToken.clean();
+                    var token = tokenHolder.token;
+                    
                     Token transformedToken = new Token();
-                    // transformedToken.current_price = tezosToken.price.ToString();
-                    transformedToken.id = tezosToken.token.id;
-                    transformedToken.name = tezosToken.token.title;
-                    transformedToken.description = tezosToken.token.description;
-                    string imageUrl = ipfsToHttp(tezosToken.token.display_uri);
+                    transformedToken.id = token.token_id;
+                    transformedToken.name = token.name;
+                    transformedToken.description = token.description;
+                    var img = (string) token.artifact_uri;
+                    string imageUrl = ipfsToHttp(img);
                     transformedToken.image_original_url = imageUrl;
                     transformedToken.image_url = imageUrl;
-                    if (tezosToken.token.mime == "video/mp4")
+                    if (token.mime == "video/mp4")
                     {
                         // Add "mp4" to the end to make it easy to determine the content type
-                        string url = string.Concat(ipfsToHttp(tezosToken.token.display_uri), "?type=mp4");
+                        string url = string.Concat(imageUrl, "?type=mp4");
                         transformedToken.animation_url = url;
                         transformedToken.image_url = url;
                         transformedToken.image_original_url = url;
-                    }
-                    else
-                    {
-                        string url = ipfsToHttp(tezosToken.token.display_uri);
-                        transformedToken.image_original_url = url;
-                        transformedToken.image_url = url;
                     }
                     tokenList.assets.Add(transformedToken);
                 }
@@ -556,7 +554,7 @@ namespace TokenCast.Controllers
             }
             string id = endpoint.Substring("ipfs://".Length);
             id = id.Replace("ipfs/", string.Empty);
-            return $"https://ipfs.io/ipfs/{id}";
+            return $"https://cloudflare-ipfs.com/ipfs/{id}";
         }
 
         private Dictionary<long, string> getTokenPrices(string address)
