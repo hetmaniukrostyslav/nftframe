@@ -240,21 +240,23 @@
 
     <div class="modal-form">
         <div class="row">
-            <div class="col-6 center">
-                <cropper
-                    id="tokenPreviewContainer"
-                    :src="selectedToken.image_url"
-                    :stencil-props="{
-          		        aspectRatio: 368/448,
-          	        }"
-                    image-restriction="none"
-                    background-class="cropper-background"
-                    v-on:change="cropperChange">
-                </cropper>
+            <div class="col-md-6 col-sm-12 center">
+                <div style="width: 330px;height: 401px">
+                    <cropper
+                        id="tokenPreviewContainer"
+                        :src="selectedToken.image_url"
+                        :stencil-props="{
+                              		        aspectRatio: 368/448,
+                              	        }"
+                        image-restriction="none"
+                        background-class="cropper-background"
+                        v-on:change="cropperChange">
+                    </cropper>
+                </div>
             </div>
 
-            <div class="col-6">
-                <div class="nft-preview">
+            <div class="col-md-6 col-sm-12">
+                <div class="nft-preview mt-1">
                     <img
                         :style="{backgroundColor: selectedBackgroundColor}"
                         v-if="canvas"

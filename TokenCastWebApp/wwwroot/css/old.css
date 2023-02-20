@@ -162,7 +162,7 @@ div.desc {
     left: 50%;
     transform: translate(-50%, 0%);
     width: 100%;
-    max-width: 50em;
+    max-width: 60em;
     max-height: 90%;
     scroll-behavior: unset;
     overflow-y: auto;
