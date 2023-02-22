@@ -10,6 +10,7 @@ using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.HttpSys;
+using Microsoft.Extensions.Caching.Memory;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Signer;
 using Nethereum.Web3;
@@ -26,11 +27,13 @@ namespace TokenCast.Controllers
 
         private readonly IDatabase Database;
         private readonly IWebSocketConnectionManager _webSocketConnectionManager;
+        private readonly IMemoryCache _memoryCache;
 
-        public AccountController(IDatabase database, IWebSocketConnectionManager webSocketConnectionManager)
+        public AccountController(IDatabase database, IWebSocketConnectionManager webSocketConnectionManager, IMemoryCache memoryCache)
         {
             Database = database;
             _webSocketConnectionManager = webSocketConnectionManager;
+            _memoryCache = memoryCache;
         }
 
         private class MessageHash
@@ -256,6 +259,9 @@ namespace TokenCast.Controllers
             }
 
             Database.AddDeviceContent(deviceDisplay).Wait();
+            
+            _memoryCache.Remove(deviceDisplay.id);
+            
             _webSocketConnectionManager.SendMessage(deviceDisplay.id, new TokenCastWebApp.Models.ClientMessageResponse
             {
                 Event = TokenCastWebApp.Models.EventType.NFTUpdated,
