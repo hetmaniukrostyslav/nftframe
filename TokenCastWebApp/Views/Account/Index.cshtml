@@ -848,12 +848,12 @@
             orientationVertical: this.orientationVertical,
             currentPrice: token.current_price,
             cropper: { 
-                width: this.cropperParams.width,
-                height: this.cropperParams.height, 
-                left: this.cropperParams.left,
-                top: this.cropperParams.top
+                width: Math.round(this.cropperParams.width),
+                height: Math.round(this.cropperParams.height), 
+                left: Math.round(this.cropperParams.left),
+                top: Math.round(this.cropperParams.top)
             },
-            rotateAngle: this.$refs.cropper.imageTransforms.rotate
+            rotateAngle: Math.round(this.$refs.cropper.imageTransforms.rotate)
           }
         }
         

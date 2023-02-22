@@ -87,17 +87,17 @@ namespace TokenCast.Controllers
             int newPositionX;
             int newPositionY;
 
-            if (offsetX < 0 && offsetY < 0)
+            if (offsetX <= 0 && offsetY <= 0)
             {
                 newPositionX = Math.Abs(offsetX);
                 newPositionY = Math.Abs(offsetY);
             }
-            else if (offsetX > 0 && offsetY > 0)
+            else if (offsetX >= 0 && offsetY >= 0)
             {
                 newPositionX = 0;
                 newPositionY = 0;
             }
-            else if (offsetX < 0 && offsetY > 0)
+            else if (offsetX <= 0 && offsetY >= 0)
             {
                 newPositionX = Math.Abs(offsetX);
                 newPositionY = 0;

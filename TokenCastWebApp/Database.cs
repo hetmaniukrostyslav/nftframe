@@ -286,7 +286,8 @@ namespace TokenCast
             {
                 prevDevice.castedTokens = new List<Display>();
             }
-            prevDevice.castedTokens.Add(device.currentDisplay);
+            prevDevice.castedTokens.Clear();
+            //prevDevice.castedTokens.Add(device.currentDisplay);
             prevDevice.currentDisplay = device.currentDisplay;
             await UpdateDevice(prevDevice);
         }
