@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -57,8 +58,10 @@ namespace TokenCast.Controllers
             
             var imageBytes = webClient.DownloadData(content.currentDisplay.tokenImageUrl);
             using var stream = new MemoryStream(imageBytes);
+            
             var image = await Image.LoadAsync(stream);
-
+            image = image.Frames.CloneFrame(0);
+            
             if (content.currentDisplay.rotateAngle != 0)
             {
                 image.Mutate(x =>
@@ -128,7 +131,7 @@ namespace TokenCast.Controllers
             {
                 inputAsString = new string(inputAsString.Skip(skip.Value).Take(take.Value).ToArray());
             }
-
+            
             return Ok(new
             {
                 c = inputAsString,
