@@ -108,7 +108,7 @@
                                         <td class="deviceListElement sidebar-menu-title-device" style="cursor:pointer"
                                             v-on:click="DeviceSelected(device)">
                                             {{ GetDeviceAlias(device) }}
-                                            <span v-if="deviceStatuses[device]" style="color: #0FFF50">Online</span>
+                                            <span v-if="deviceStatuses.indexOf(device) !== -1" style="color: #0FFF50">Online</span>
                                             <span v-else style="color: #FF5733">Offline</span>
                                         </td>
                                     </tr>
@@ -183,7 +183,7 @@
     </div>
     <div>
         <span class="modal-title">Device</span>
-        <span v-if="deviceStatuses[selectedDeviceId]" style="color: #0FFF50">Online</span>
+        <span v-if="deviceStatuses.indexOf(selectedDeviceId) !== -1" style="color: #0FFF50">Online</span>
         <span v-else style="color: #FF5733">Offline</span>
     </div>
 
@@ -304,10 +304,10 @@
 
         <div>
             <span class="modal-form-title">Device</span>
-            <span v-if="deviceStatuses[selected]" style="color: #0FFF50">Online</span>
+            <span v-if="deviceStatuses.indexOf(selected) !== -1" style="color: #0FFF50">Online</span>
             <span v-else style="color: #FF5733">Offline</span>
         </div>
-        <span class="modal-form-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut, culpa</span>
+        @* <span class="modal-form-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut, culpa</span> *@
 
         <select id="deviceSelection" class="device-cast-select" v-model="selected">
             <option v-for="device in account.devices" :value="device">
@@ -462,7 +462,7 @@
       tezosWalletConnected: false,
       whitelabeler: '',
       selected: '',
-      deviceStatuses: {},
+      deviceStatuses: [],
       deviceStatusSocket: null,
       cropperImage: null,
       cropperParams: { x: 0, y: 0, scale: 1, isMoving: false, height: null, width: null, isGif: false },
@@ -470,24 +470,24 @@
     },
     async mounted () {
       await onLoad(true, false)
-      const resp = await fetch('/connect/ui/create', { method: 'POST' })
-      const { connectionId } = await resp.json()
-      this.deviceStatusesSocket = new WebSocket(
-        `wss://nftframe.azurewebsites.net/connect/ui?connectionId=${connectionId}&address=${this.address}`
-      );
-
-      this.deviceStatusesSocket.onmessage = (event) => {
-        console.log("device statuses event", event.data)
-        const data = JSON.parse(event.data)
-
-        if (data.event == 'Online') {
-          this.deviceStatuses[data.deviceId] = true
-        }
-
-        if (data.event == 'Offline') {
-          this.deviceStatuses[data.deviceId] = false
-        }
-      }
+      // const resp = await fetch('/connect/ui/create', { method: 'POST' })
+      // const { connectionId } = await resp.json()
+      // this.deviceStatusesSocket = new WebSocket(
+      //   `wss://localhost:5001/connect/ui?connectionId=${connectionId}&address=${app.address}`
+      // );
+      //
+      // this.deviceStatusesSocket.onmessage = (event) => {
+      //   console.log("device statuses event", event.data)
+      //   const data = JSON.parse(event.data)
+      //
+      //   if (data.event == 'Online') {
+      //     this.deviceStatuses[data.deviceId] = true
+      //   }
+      //
+      //   if (data.event == 'Offline') {
+      //     this.deviceStatuses[data.deviceId] = false
+      //   }
+      // }
     },
     computed: {
       filteredItems() {

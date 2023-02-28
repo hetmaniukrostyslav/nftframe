@@ -12,6 +12,8 @@ using TokenCastWebApp.Socket;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Linq;
+using TokenCast;
 
 namespace TokenCastWebApp.Managers
 {
@@ -24,10 +26,13 @@ namespace TokenCastWebApp.Managers
         private readonly ILoggerFactory _loggerFactory;
         private readonly RealtimeOptions _realtimeOptions;
         private readonly ISystemTextJsonSerializer _serializer;
-        private readonly IStatusWebSocketConnectionManager _statusWebSocketConnectionManager;
+        private readonly IDatabase _database;
 
-        private ConcurrentDictionary<string, IWebSocketConnection> _webSockets = new ConcurrentDictionary<string, IWebSocketConnection>();
+        private readonly ConcurrentDictionary<string, IWebSocketConnection> _webSockets =
+            new ConcurrentDictionary<string, IWebSocketConnection>();
 
+        private readonly ConcurrentDictionary<string, IWebSocketConnection> _uiWebSockets =
+            new ConcurrentDictionary<string, IWebSocketConnection>();
 
         #endregion
 
@@ -37,16 +42,17 @@ namespace TokenCastWebApp.Managers
             ILoggerFactory loggerFactory,
             IOptions<RealtimeOptions> realtimeOptions,
             ISystemTextJsonSerializer serializer,
-            IStatusWebSocketConnectionManager statusWebSocketConnectionManager)
+            IDatabase database)
         {
             _logger = logger;
             _loggerFactory = loggerFactory;
             _realtimeOptions = realtimeOptions.Value;
             _serializer = serializer;
 
-            var cacheOptions = new MemoryCacheOptions { ExpirationScanFrequency = TimeSpan.FromSeconds(_realtimeOptions.ExpirationScanFrequency) };
+            var cacheOptions = new MemoryCacheOptions
+                { ExpirationScanFrequency = TimeSpan.FromSeconds(_realtimeOptions.ExpirationScanFrequency) };
             _tempSessionIdCache = new MemoryCache(cacheOptions, _loggerFactory);
-            _statusWebSocketConnectionManager = statusWebSocketConnectionManager;
+            _database = database;
         }
 
         #endregion
@@ -56,8 +62,9 @@ namespace TokenCastWebApp.Managers
         public string GenerateConnectionId(string deviceId)
         {
             var connectionId = Guid.NewGuid().ToString();
-
-            _tempSessionIdCache.Set(connectionId, deviceId, TimeSpan.FromSeconds(_realtimeOptions.CacheItemExpirationTime));
+            //
+            // _tempSessionIdCache.Set(connectionId, deviceId,
+            //     TimeSpan.FromSeconds(_realtimeOptions.CacheItemExpirationTime));
 
             return connectionId;
         }
@@ -72,19 +79,61 @@ namespace TokenCastWebApp.Managers
             return exist;
         }
 
-        public async Task ConnectAsync(string connectionId, string deviceId, WebSocket webSocket, CancellationToken cancellationToken)
+        public async Task ConnectAsync(string connectionId, string deviceId, WebSocket webSocket,
+            CancellationToken cancellationToken)
         {
-            var webSocketConnection = new WebSocketConnection(connectionId, deviceId, webSocket, cancellationToken, _loggerFactory, this, _serializer);
+            var webSocketConnection = new WebSocketConnection(connectionId, deviceId, null, webSocket,
+                cancellationToken, _loggerFactory, this, _serializer);
 
             _logger.LogInformation($"New WebSocket session {webSocketConnection.ConnectionId} connected.");
 
             _webSockets.TryAdd(deviceId, webSocketConnection);
-            _statusWebSocketConnectionManager.SendMessage(deviceId, new ClientMessageResponse
+            // _statusWebSocketConnectionManager.SendMessage(deviceId, new ClientMessageResponse
+            // {
+            //     Event = EventType.Online,
+            //     Message = "Device is online",
+            //     Success = true
+            // });
+
+            SendMessageToUI(deviceId, new ClientMessageResponse
             {
                 Event = EventType.Online,
                 Message = "Device is online",
                 Success = true
             });
+            await webSocketConnection.StartReceiveMessageAsync().ConfigureAwait(false);
+        }
+
+        private void SendMessageToUI(string deviceId, ClientMessageResponse message)
+        {
+            message.DeviceId = deviceId;
+            var accounts = _database.GetAllAccount().GetAwaiter().GetResult().Where(x => x.devices.Contains(deviceId))
+                .ToArray();
+
+            foreach (var account in accounts)
+            {
+                if (_uiWebSockets.TryGetValue(account.address.ToUpperInvariant(), out var webSocketConnection))
+                {
+                    webSocketConnection.Send(ConvertMessageToBytes(message));
+                }
+            }
+        }
+
+        public async Task ConnectUIAsync(string connectionId, string address, WebSocket webSocket,
+            CancellationToken cancellationToken)
+        {
+            var webSocketConnection = new WebSocketConnection(connectionId, null, address, webSocket, cancellationToken,
+                _loggerFactory, this, _serializer);
+
+            _logger.LogInformation($"New WebSocket session {webSocketConnection.ConnectionId} connected.");
+
+            _uiWebSockets.TryAdd(address.ToUpperInvariant(), webSocketConnection);
+            // _statusWebSocketConnectionManager.SendMessage(deviceId, new ClientMessageResponse
+            // {
+            //     Event = EventType.Online,
+            //     Message = "Device is online",
+            //     Success = true
+            // });
             await webSocketConnection.StartReceiveMessageAsync().ConfigureAwait(false);
         }
 
@@ -94,23 +143,34 @@ namespace TokenCastWebApp.Managers
 
         public void HandleHeartbeat(IWebSocketConnection connection)
         {
-            _statusWebSocketConnectionManager.SendMessage(connection.DeviceId, new ClientMessageResponse
+            if (!string.IsNullOrWhiteSpace(connection.DeviceId))
             {
-                Event = EventType.Online,
-                Message = "Device is online",
-                Success = true
-            });
+                SendMessageToUI(connection.DeviceId, new ClientMessageResponse
+                {
+                    Event = EventType.Online,
+                    Message = "Device is online",
+                    Success = true
+                });
+            }
         }
 
         public void HandleDisconnection(IWebSocketConnection connection)
         {
-            _statusWebSocketConnectionManager.SendMessage(connection.DeviceId, new ClientMessageResponse
+            if (!string.IsNullOrWhiteSpace(connection.DeviceId))
             {
-                Event = EventType.Offline,
-                Message = "Device is offline",
-                Success = true
-            });
-            _webSockets.TryRemove(connection.DeviceId, out var conn);
+                SendMessageToUI(connection.DeviceId, new ClientMessageResponse
+                {
+                    Event = EventType.Offline,
+                    Message = "Device is offline",
+                    Success = true
+                });
+                _webSockets.TryRemove(connection.DeviceId, out _);
+            }
+
+            if (!string.IsNullOrWhiteSpace(connection.Address))
+            {
+                _uiWebSockets.TryRemove(connection.Address.ToUpper(), out _);
+            }
         }
 
         public void HandleMessage(SocketClientMessage message)
@@ -128,11 +188,11 @@ namespace TokenCastWebApp.Managers
                     return;
                 }
 
-                if(subscribeMessage.Action == SubscribeAction.UpdateNft)
+                if (subscribeMessage.Action == SubscribeAction.UpdateNft)
                 {
                     response.Event = EventType.NFTUpdated;
                     response.Message = "Event raised!";
-                }  
+                }
             }
             catch (Exception ex)
             {
@@ -149,7 +209,7 @@ namespace TokenCastWebApp.Managers
 
         public void SendMessage(string deviceId, ClientMessageResponse message)
         {
-            if(_webSockets.TryGetValue(deviceId, out var connection))
+            if (_webSockets.TryGetValue(deviceId, out var connection))
             {
                 connection.Send(ConvertMessageToBytes(message));
             }

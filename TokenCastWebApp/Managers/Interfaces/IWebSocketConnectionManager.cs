@@ -12,6 +12,7 @@ namespace TokenCastWebApp.Managers.Interfaces
         bool TryGetDeviceId(string connectionId, out string deviceId);
 
         Task ConnectAsync(string connectionId, string deviceId, WebSocket webSocket, CancellationToken cancellationToken);
+        Task ConnectUIAsync(string connectionId, string address, WebSocket webSocket, CancellationToken cancellationToken);
 
         void SendMessage(string deviceId, ClientMessageResponse message);
     }

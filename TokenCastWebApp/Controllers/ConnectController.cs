@@ -61,7 +61,7 @@ namespace TokenCastWebApp.Controllers
         [HttpPost("ui/create")]
         public Task<IActionResult> CreateUIAsync([FromQuery] string deviceId)
         {
-            var connectionId = _statusWebSocketConnectionManager.GenerateConnectionId(deviceId);
+            var connectionId = _webSocketConnectionManager.GenerateConnectionId(deviceId);
             return Task.FromResult<IActionResult>(Ok(new
             {
                 ConnectionId = connectionId
@@ -89,7 +89,7 @@ namespace TokenCastWebApp.Controllers
 
             var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
 
-            await _statusWebSocketConnectionManager.ConnectAsync(connectionId, address, webSocket, cancellationToken);
+            await _webSocketConnectionManager.ConnectUIAsync(connectionId, address, webSocket, cancellationToken);
 
             return Ok();
         }

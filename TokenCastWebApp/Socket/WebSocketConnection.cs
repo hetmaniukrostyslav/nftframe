@@ -34,6 +34,7 @@ namespace TokenCastWebApp.Socket
 
         public WebSocketConnection(string connectionId,
         string deviceId,
+        string address,
         WebSocket webSocket,
             CancellationToken cancellationToken,
             ILoggerFactory loggerFactory,
@@ -60,6 +61,7 @@ namespace TokenCastWebApp.Socket
             _timer.Elapsed += _timer_Elapsed;
             ConnectionId = connectionId;
             DeviceId = deviceId;
+            Address = address;
             _webSocket = webSocket;
             _cancellationToken = cancellationToken;
             _logger = loggerFactory.CreateLogger<IWebSocketConnection>();
@@ -68,9 +70,11 @@ namespace TokenCastWebApp.Socket
             _messagesQueueProcessor = new QueueProcessor<byte[]>(ProcessSendAsync, loggerFactory.CreateLogger<QueueProcessor<byte[]>>());
         }
 
+
         #endregion
 
         #region IWebSocketConnection members
+        public string Address { get; set; }
 
         public string ConnectionId { get; }
 
