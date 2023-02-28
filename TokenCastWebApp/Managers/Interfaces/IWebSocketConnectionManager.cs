@@ -7,7 +7,7 @@ namespace TokenCastWebApp.Managers.Interfaces
 {
     public interface IWebSocketConnectionManager
     {
-        string GenerateConnectionId(string deviceId);
+        Task<string> GenerateConnectionId(string deviceId);
 
         bool TryGetDeviceId(string connectionId, out string deviceId);
 

@@ -14,20 +14,27 @@ namespace TokenCastWebApp.Controllers
         private readonly IWebSocketConnectionManager _webSocketConnectionManager;
         private readonly IStatusWebSocketConnectionManager _statusWebSocketConnectionManager;
 
-        public ConnectController(IWebSocketConnectionManager webSocketConnectionManager, IStatusWebSocketConnectionManager statusWebSocketConnectionManager)
+        public ConnectController(IWebSocketConnectionManager webSocketConnectionManager,
+            IStatusWebSocketConnectionManager statusWebSocketConnectionManager)
         {
             _webSocketConnectionManager = webSocketConnectionManager;
             _statusWebSocketConnectionManager = statusWebSocketConnectionManager;
         }
 
         [HttpPost("create")]
-        public Task<IActionResult> CreateAsync([FromQuery] string deviceId)
+        public async Task<IActionResult> CreateAsync([FromQuery] string deviceId)
         {
-            var connectionId = _webSocketConnectionManager.GenerateConnectionId(deviceId);
-            return Task.FromResult<IActionResult>(Ok(new
+            var connectionId = await _webSocketConnectionManager.GenerateConnectionId(deviceId);
+
+            if (connectionId == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new
             {
                 ConnectionId = connectionId
-            }));
+            });
         }
 
         [HttpGet]
@@ -55,7 +62,6 @@ namespace TokenCastWebApp.Controllers
 
             return Ok();
         }
-
 
 
         [HttpPost("ui/create")]
@@ -93,8 +99,6 @@ namespace TokenCastWebApp.Controllers
 
             return Ok();
         }
-
-
 
 
         #region Private methods

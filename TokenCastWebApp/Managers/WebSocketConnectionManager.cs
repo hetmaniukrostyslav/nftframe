@@ -59,14 +59,19 @@ namespace TokenCastWebApp.Managers
 
         #region IWebSocketConnectionManager members
 
-        public string GenerateConnectionId(string deviceId)
+        public async Task<string> GenerateConnectionId(string deviceId)
         {
-            var connectionId = Guid.NewGuid().ToString();
-            //
-            // _tempSessionIdCache.Set(connectionId, deviceId,
-            //     TimeSpan.FromSeconds(_realtimeOptions.CacheItemExpirationTime));
+            if (deviceId == null) return null;
 
-            return connectionId;
+            var accounts = await _database.GetAllAccount();
+            var exists = accounts.Any(a => a.devices.Contains(deviceId));
+
+            if (exists)
+            {
+                return Guid.NewGuid().ToString();
+            }
+
+            return null;
         }
 
         public bool TryGetDeviceId(string connectionId, out string deviceId)
