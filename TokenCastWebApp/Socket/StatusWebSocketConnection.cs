@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
 using System.IO;
 using System.Net.WebSockets;

@@ -31,19 +31,19 @@
 }
 
 .device-update-form {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    grid-column-gap: 100px;
-    grid-row-gap: 0;
+    /*display: grid;
+    grid-template-columns: repeat(2, 1fr);*/
+
+   /* grid-column-gap: 100px;
+    grid-row-gap: 0;*/
 }
 
 .device-add-form {
-    display: grid;
+    /*display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(1, 1fr);
     grid-column-gap: 100px;
-    grid-row-gap: 0;
+    grid-row-gap: 0;*/
 }
 
 @media (max-width: 600px) {
@@ -76,7 +76,7 @@
     line-height: 16px;
     letter-spacing: 0.01em;
     color: #676767;
-
+    max-width: 290px;
     margin-bottom: 10px;
 }
 
@@ -101,4 +101,114 @@
     border: none;
     border-bottom: solid thin black;
     padding: 10px 0;
+
+    max-width: 450px;
+}
+
+
+.inputForm .closeModalForm:hover {
+    transform: rotate(90deg);
+    transition: transform 0.5s;
+    cursor: pointer;
+}
+
+
+/* Cast tocken form */
+.castYourTockenForm .nft-preview {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.castYourTockenForm .device-online-status {
+    font-size: 13px;
+    padding: 0px 5px;
+    color: #0FFF50;
+    border: 1px solid;
+    border-radius: 5px;
+    letter-spacing: 0.3px;
+}
+
+.castYourTockenForm .device-offline-status {
+    font-size: 13px;
+    padding: 0px 5px;
+    color: #FF5733;
+    border: 1px solid;
+    border-radius: 5px;
+    letter-spacing: 0.3px;
+}
+
+#displayTokenButton {
+    border: 2px solid #000;
+}
+    #displayTokenButton i {
+        padding-left: 5px;
+    }
+
+    #displayTokenButton:hover, #displayTokenButton:active {
+        background: #fff;
+        color: #000 !important;
+        border: 2px solid #000!important;
+    }
+        #displayTokenButton:hover i {
+            color: #8C51EE;
+        }
+
+
+@media (max-width: 767px) {
+
+    .castYourTockenForm {
+        max-width: 40em;
+    }
+        .castYourTockenForm .nft-preview {
+            margin-left: 0;
+            margin-right: auto;
+        }
+}
+
+@media (max-width: 600px) {
+    .castYourTockenForm .modal-title {
+        font-weight: 30px!important;
+    }
+}
+
+/* Register new Snitch form */
+.registerNewSnitchForm button {
+    border: 2px solid #000;
+}
+.registerNewSnitchForm button i {
+    padding-left: 5px;
+    font-weight: 400;
+}
+    .registerNewSnitchForm button:hover, .registerNewSnitchForm button:active {
+        background: #fff;
+        color: #000;
+        border: 2px solid #000 !important;
+    }
+
+@media (max-width: 600px){
+    .inputForm .modal-title {
+        max-width: 250px;
+    }
+}
+
+
+
+/* Edit device form */
+
+.device-change-buttons-wrapper .col:last-child {
+    text-align: right;
+}
+
+@media (max-width: 653px) {
+    .deviceEditForm .modal-form  .col:last-child {
+        margin-top: 20px;
+    }
+    .deviceEditForm .modal-form-description {
+        max-width: 300px
+    }
+}
+@media (max-width: 575px) {
+    .device-change-buttons-wrapper .col:last-child {
+        text-align: left;
+    }
 }

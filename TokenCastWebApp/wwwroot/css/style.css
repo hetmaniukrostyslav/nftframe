@@ -19,7 +19,17 @@ input:focus {
 html {
     font-family: 'Roboto', sans-serif !important;
     font-style: normal;
+    overflow-x: hidden;
 }
+
+#app {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+    #app main {
+        flex: 1;
+    }
 
 .navbar {
     position:fixed;
@@ -31,12 +41,55 @@ html {
     z-index:999;
 }
 
+#svg-header-logo {
+    height: 20px;
+    display: block;
+    fill: #fff;
+}
+
+
 .content {
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 70vh;
-    margin: 80px 20% 0;
+    margin: 90px auto 0;
+    max-width: 884px;
+}
+    .content .proveOwrnershipInfo {
+        background: #fff;
+        color: #000;
+        font-size: 1.2em;
+        font-weight: 300;
+        padding: 55px;
+        border-radius: 46.9146px;
+        max-width: 450px;
+    }
+        .content .proveOwrnershipInfo .icon-wrapper {
+            display: inline-block;
+            background: #FF5733;
+            padding: 22px;
+            border-radius: 67px;
+        }
+            .content .proveOwrnershipInfo .icon-wrapper i {
+                font-size: 40px;
+                border: 5px solid;
+                border-radius: 46px;
+                padding: 20px;
+                color: #fff;
+            }
+            .content .proveOwrnershipInfo  h1 {
+                text-align: center;
+                margin-top: 20px;
+            }
+            .content .proveOwrnershipInfo p {
+                margin-top: 50px;
+                text-align: center;
+            }
+
+.content .fetchingTockenInfo h1 {
+    color: #fff;
+    margin-top: 100px;
 }
 
 @media (max-width: 840px) {
@@ -68,11 +121,28 @@ html {
 
 .title-second-part {
     background: linear-gradient(99.77deg, #8C50ED 9.08%, #EF88C6 99.58%);
+    animation: gradient 5s ease infinite;
+    background-size: 120%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-fill-color: transparent;
+    word-break: break-all;
 }
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
 
 .search {
     display: flex;
@@ -83,6 +153,8 @@ html {
 .search-container {
     display: flex;
     position: relative;
+    background: #8C51EE;
+    border-radius: 40px;
 }
 
 .search-input {
@@ -91,20 +163,25 @@ html {
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 10px 0 10px 40px !important;
+    padding: 12px 0 12px 40px !important;
 
     background: #000000;
     border: 2px solid #8C51EE;
-    border-radius: 40px 0px 0px 40px;
+    border-radius: 40px;
 
-    font-weight: 200;
+    font-weight: 300;
     font-size: 20px;
     line-height: 23px;
 
     color: #BFBFBF;
     min-width: 420px;
 }
-
+@media (max-width: 767px){
+    .content .proveOwrnershipInfo {
+        max-width: 350px;
+        padding: 40px 35px;
+    }
+}
 @media (max-width: 600px) {
     .search-input {
         min-width: 280px !important;
@@ -147,7 +224,7 @@ html {
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    padding: 10px 32px 10px 32px;
+    padding: 12px 32px 12px 32px;
 
     background: #8C51EE;
     border-radius: 0 40px 40px 0;
@@ -165,7 +242,7 @@ html {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(auto-fill, 1fr);
-    grid-column-gap: 20px;
+    grid-column-gap: 22px;
     grid-row-gap: 60px;
 
     margin-top: 124px;
@@ -177,7 +254,6 @@ html {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(auto-fill, 1fr);
-        grid-column-gap: 10px;
         grid-row-gap: 40px;
 
         margin-top: 124px;
@@ -185,7 +261,7 @@ html {
     }
 }
 
-@media (max-width: 530px) {
+@media (max-width: 630px) {
     .nfts-list {
         display: flex;
         flex-direction: column;
@@ -200,11 +276,12 @@ html {
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-width: 280px;
 }
 
 .nft-image {
-    width: 256px;
-    height: 256px;
+    width: 280px;
+    height: 280px;
     border-radius: 60px;
 
     margin-bottom: 20px;
@@ -212,36 +289,41 @@ html {
 }
 
 .nft-name {
-    font-weight: 400;
+    font-weight: 300;
     font-size: 30px;
-    line-height: 105%;
+    line-height: 115%;
 
     color: #FFFFFF;
 }
 
+/* FOOTER */
+
 footer {
-    min-height: 300px;
-    background: linear-gradient(0deg, #FFFFFF, #FFFFFF), linear-gradient(144.48deg, #8C51EE 7.28%, #E690E2 91.58%);
-    border-radius: 90px 90px 0 0;
+    min-height: 215px;
+    background: white;
+    border-radius: 60px 60px 0 0;
 
     display: flex !important;
     align-items: center;
 }
 
-.footer-container {
-    display: flex;
-    justify-content: space-between;
+    .footer-container {
+        display: flex;
+        justify-content: space-between;
 
-    width: 100%;
-    padding: 0 80px;
+        width: 100%;
+        padding: 0 80px;
+    }
+
+
+.email-container-wrapper {
+    visibility: hidden;
 }
-
 
 .email-container {
     display: flex;
     padding-bottom: 10px;
     min-width: 550px;
-
     border-bottom: thin black solid;
 }
 
@@ -269,15 +351,33 @@ footer {
     color: #FFFFFF;
 }
 
-@media (max-width: 830px) {
+@media (max-width: 1140px) {
     .footer-container {
         flex-direction: column;
         padding: 0 40px;
     }
+        footer h2 svg {
+            max-height: 50px;
+            display: block;
+            margin: 0 auto;
+        }
+        footer span {
+            display: block;
+            text-align: center;
+        }
 
-    .email-container {
-        min-width: auto !important;
+
+    .email-container-wrapper {
+        display: none;
     }
+
+   /* .email-button {
+        margin-top: 15px;
+    }
+
+    .email-input {
+        border-bottom: thin #a6a6a6 solid;
+    }*/
 }
 
 @media (min-width: 600px) {
@@ -297,13 +397,13 @@ footer {
     }
 
     footer {
-        min-height: 250px !important;
+        /*min-height: 250px !important;*/
         border-radius: 80px 80px 0 0;
     }
 }
 
 @media (max-width: 460px) {
-    .email-container {
+    /*.email-container {
         flex-direction: column;
         border: none;
     }
@@ -314,7 +414,7 @@ footer {
 
     .email-input {
         border-bottom: thin #a6a6a6 solid;
-    }
+    }*/
 }
 
 .cropper-background {

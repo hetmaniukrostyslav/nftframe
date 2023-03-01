@@ -1,4 +1,4 @@
-﻿var whiteLabelers = {
+var whiteLabelers = {
     strangepainters: {
         title: "NFT Caster",
         url: "https://app.nftcaster.com",

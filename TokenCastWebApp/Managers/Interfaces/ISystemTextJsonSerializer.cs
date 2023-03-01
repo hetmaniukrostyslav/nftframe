@@ -1,4 +1,4 @@
-﻿namespace TokenCastWebApp.Managers.Interfaces
+namespace TokenCastWebApp.Managers.Interfaces
 {
     public interface IJsonSerializer
     {
