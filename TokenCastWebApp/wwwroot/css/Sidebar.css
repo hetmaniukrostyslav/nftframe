@@ -77,6 +77,14 @@ ul.sidebar-panel-nav > li > span {
     height: 300px;
 }
 
+.chooseNetwork-container {
+    padding: 10em 0;
+}
+    .chooseNetwork-container h1 {
+        color: #fff;
+    }
+
+
 .walletcontainer {
     background-color: #fff !important;
     padding: 2em;
@@ -85,15 +93,28 @@ ul.sidebar-panel-nav > li > span {
 
 .walletbtn {
     background-color: #000 !important;
+    border: 2px solid #000;
     display: block;
-    margin-top:1em;
-    margin-left:1em;
-    margin-right:1em;
+    margin-top: 60px;
+    margin-left: 1em;
+    margin-right: 1em;
+    letter-spacing: 0.01em;
     color: #fff !important;
     height: 40.11px;
-    width:88%;
+    width: 88%;
     border-radius: 20px !important;
 }
+    .walletbtn:hover, .walletbtn:active {
+        background-color: #EFEFEF !important;
+        border-color: #000;
+        font-weight: 700;
+        color: #000 !important;
+        letter-spacing: 0.05em;
+        animation: 0.5s ease;
+    }
+    .walletbtn:focus {
+        box-shadow: 0 0 0 0.2rem rgb(0 0 0 / 10%);
+    }
 
 .walletimg {
     width: 156.75px;
@@ -107,4 +128,35 @@ ul.sidebar-panel-nav > li > span {
 }
 
 .column {
+}
+
+
+@media (max-width: 769px) {
+
+    /* Account page (login) */
+
+    .walletcontainer {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Account page (login) */
+
+    .walletcontainer {
+        border-radius: 41.6144px !important;
+    }
+
+    .walletblock {
+        width: 230px;
+        height: 230px;
+    }
+
+    .walletimg {
+        width: 140.75px;
+    }
+
+    .walletbtn {
+        margin-top: 5px;
+    }
 }

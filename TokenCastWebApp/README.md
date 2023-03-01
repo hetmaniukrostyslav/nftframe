@@ -1,4 +1,4 @@
-﻿
+
 
 ## Running locally
 Navigate to the TokenCastWebApp directory and run `Dotnet watch run`

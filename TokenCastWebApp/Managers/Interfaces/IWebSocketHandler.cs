@@ -1,4 +1,4 @@
-﻿using TokenCastWebApp.Models;
+using TokenCastWebApp.Models;
 
 namespace TokenCastWebApp.Managers.Interfaces
 {

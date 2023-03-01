@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
+using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 using Nethereum.BlockchainProcessing.BlockStorage.Entities.Mapping;
 using System;
 

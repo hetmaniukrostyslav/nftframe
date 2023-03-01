@@ -1,4 +1,4 @@
-﻿namespace TokenCastWebApp.Models
+namespace TokenCastWebApp.Models
 {
     public sealed class ClientMessageResponse
     {
